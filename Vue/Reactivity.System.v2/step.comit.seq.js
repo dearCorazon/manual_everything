@@ -1,10 +1,10 @@
-//按照commit覆盖
-//step1：实现一个简单的响应式---深度检测对象的全部属性
+//step2：实现一个简单的响应式---深度检测对象的全部属性
 // 方法：defineProperty
 // 
 
 class Obeserver {
     constructor(value) {
+        def(value,'_ob_')
         this.walk(value)
     }
     walk(value){
@@ -27,7 +27,30 @@ function defineReactive(obj,key,val) {
         },
         set:function reactiveSet(newVal) {
             val = newVal
+            obeserve(val)
         }
+    })
+}
+// Q3：这个函数是干什么的？
+function obeserve (value) {
+    //Q1：为什么对象要这样子判断
+    if(typeof value !== 'object') return 
+    let ob
+    //Q2： 为什么_ob_要判断两个条件 看起来第一个条件就成立了
+    if(value.hasOwnProperty('_ob_') && value._ob_ instanceof Obeserver) {
+        ob = value._ob_
+    }else {
+        ob = new Obeserver(value)
+    }
+    return ob
+
+}
+function def(obj,key,enumerable=false)  {
+    Object.defineProperty(obj,key,{
+        enumerable,
+        //为什么要把value设置成this
+        value:this
+        
     })
 }
 
