@@ -1,11 +1,16 @@
 //step2：实现一个简单的响应式---深度检测对象的全部属性
 // 方法：defineProperty
-// 
+//step3：新增数组的响应式处理
 
 class Obeserver {
     constructor(value) {
+        //根据是否为数组还是对象进行不同响应式设计
         def(value,'_ob_')
-        this.walk(value)
+        if(Array.isArray(value)) {
+            obeserveArray(value)
+        }else {
+            this.walk(value)
+        }
     }
     walk(value){
         const keys = Object.keys(value)
@@ -30,6 +35,11 @@ function defineReactive(obj,key,val) {
             obeserve(val)
         }
     })
+}
+function  obeserveArray (value) {
+    for(let i=0;i<value.length;i++) {
+        obeserve(value[i])
+    }
 }
 // Q3：这个函数是干什么的？
 function obeserve (value) {
