@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack && node dist/bundle.js"
+  },
+  "dependencies": {
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.4",
+    "@babel/preset-env": "^7.24.4",
+    "babel-loader": "^9.1.3"
+  }
+}

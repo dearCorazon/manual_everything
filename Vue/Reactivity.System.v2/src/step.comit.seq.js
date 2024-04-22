@@ -1,13 +1,32 @@
 //step2：实现一个简单的响应式---深度检测对象的全部属性
 // 方法：defineProperty
 //step3：新增数组的响应式处理
-
-class Obeserver {
+const arrayMethods = Object.create(Array.prototype)
+const methodNeedChange = [
+    'push',
+    'pop',
+    'shift',
+    'unshift',
+    'splice',
+    'sort',
+    'reverse'
+]
+methodNeedChange.forEach(method=>{
+    const origin = arrayMethods[method]
+    //Q5:这里为什么不能用箭头函数
+    def(arrayMethods,method,function(){
+        console.log('dddd');
+        origin.apply(this,arguments)
+    },false)
+})
+class Observer {
     constructor(value) {
         //根据是否为数组还是对象进行不同响应式设计
-        def(value,'_ob_')
+        def(value,'_ob_',this)
         if(Array.isArray(value)) {
-            obeserveArray(value)
+            observeArray(value)
+            value.__proto__ = arrayMethods
+            // Object.setPrototypeOf(value,arrayMethods)
         }else {
             this.walk(value)
         }
@@ -20,12 +39,12 @@ class Obeserver {
 function defineReactive(obj,key,val) {
     if(arguments.length === 2 ) {
         val = obj[key]
-        if(typeof val === Object) {
-            new Obeserver(val)
+        if(typeof val === 'object') {
+            new Observer(val)
         }
     }
     Object.defineProperty(obj,key,{
-        enumerable:true,
+        enumerable:false,
         configurable: true,
         get:function reactiveGet() {
             return val
@@ -36,7 +55,7 @@ function defineReactive(obj,key,val) {
         }
     })
 }
-function  obeserveArray (value) {
+export function  observeArray (value) {
     for(let i=0;i<value.length;i++) {
         obeserve(value[i])
     }
@@ -47,10 +66,10 @@ function obeserve (value) {
     if(typeof value !== 'object') return 
     let ob
     //Q2： 为什么_ob_要判断两个条件 看起来第一个条件就成立了
-    if(value.hasOwnProperty('_ob_') && value._ob_ instanceof Obeserver) {
+    if(value.hasOwnProperty('_ob_') && value._ob_ instanceof Observer) {
         ob = value._ob_
     }else {
-        ob = new Obeserver(value)
+        ob = new Observer(value)
     }
     return ob
 
@@ -111,13 +130,14 @@ let data2 ={
             }
         }
     }}
-new Obeserver(data)
-new Obeserver(data2)
+// new Observer(data)
+// new Observer(data2)
 
 
 data2 = {3:"2"}
 
-
-console.log(data);
-console.log(data2);
-
+let a = [1,2,3,4,5]
+obeserve(a)
+console.log(a);
+a.push('ccc')
+a.push('avk')
